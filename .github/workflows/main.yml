@@ -23,14 +23,17 @@ jobs:
 
       - name: Check if branch is rebased
         run: |
-          BASE_BRANCH=${{ inputs.base_branch }}
-          git fetch origin
-          BASE_COMMIT=$(git rev-parse origin/$BASE_BRANCH)
-          CURRENT_BRANCH_BASE=$(git merge-base HEAD origin/$BASE_BRANCH)
-          if [ "$BASE_COMMIT" == "$CURRENT_BRANCH_BASE" ]; then
-            echo "The current branch has been rebased onto $BASE_BRANCH."
-          else
-            echo "The current branch has NOT been rebased onto $BASE_BRANCH."
+          git_hash=$(git rev-parse "$GITHUB_SHA")
+          echo "Branch commit: $git_hash"
+
+          main_head=$(git rev-parse origin/main)
+          echo "Trunk head: $main_head"
+
+          branch_source_commit_id="$(git merge-base "$git_hash" origin/main)"
+          echo "First commir of this branch: $branch_source_commit_id"
+
+          if [[ "$branch_source_commit_id" != "$main_head" ]]; then
+            echo "Error: you need to rebase your branch with head main."
             exit 1
           fi
 
