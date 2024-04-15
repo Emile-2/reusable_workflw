@@ -10,6 +10,7 @@ on:
         required: true
         type: string
 jobs:
+
   check-rebase:
     runs-on: ubuntu-latest
     steps:
@@ -19,17 +20,17 @@ jobs:
           fetch-depth: 0
           token: ${{inputs.github_token }}
 
-    - name: Check if branch is rebased
-      run: |
-        current_branch=$(git rev-parse --abbrev-ref HEAD)
-        git fetch origin
-        latest_upstream_commit=$(git rev-parse origin/master)
-        if git merge-base --is-ancestor $latest_upstream_commit $current_branch; then
-            echo "The branch '$current_branch' has been rebased on 'origin/master'."
-        else
-            echo "The branch '$current_branch' has not been rebased on 'origin/master'."
-            exit 1
-        fi
+      - name: Check if branch is rebased
+        run: |
+          current_branch=$(git rev-parse --abbrev-ref HEAD)
+          git fetch origin
+          latest_upstream_commit=$(git rev-parse origin/master)
+          if git merge-base --is-ancestor $latest_upstream_commit $current_branch; then
+              echo "The branch '$current_branch' has been rebased on 'origin/master'."
+          else
+              echo "The branch '$current_branch' has not been rebased on 'origin/master'."
+              exit 1
+          fi
 
 
   
