@@ -6,9 +6,10 @@ on:
       base_branch:
         required: true
         type: string
+    secrets:
       github_token:
         required: true
-        type: string
+        
 jobs:
 
   check-rebase:
