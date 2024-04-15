@@ -23,15 +23,17 @@ jobs:
 
       - name: Check if branch is rebased
         run: |
-          current_branch=$(git rev-parse --abbrev-ref HEAD)
+          BASE_BRANCH=${{ inputs.base_branch }}
           git fetch origin
-          latest_upstream_commit=$(git rev-parse origin/main)
-          if git merge-base --is-ancestor $latest_upstream_commit $current_branch; then
-              echo "The branch '$current_branch' has been rebased on 'origin/main'."
+          BASE_COMMIT=$(git rev-parse origin/$BASE_BRANCH)
+          CURRENT_BRANCH_BASE=$(git merge-base HEAD origin/$BASE_BRANCH)
+          if [ "$BASE_COMMIT" == "$CURRENT_BRANCH_BASE" ]; then
+            echo "The current branch has been rebased onto $BASE_BRANCH."
           else
-              echo "The branch '$current_branch' has not been rebased on 'origin/main'."
-              exit 1
+            echo "The current branch has NOT been rebased onto $BASE_BRANCH."
+            exit 1
           fi
+
 
 
   
