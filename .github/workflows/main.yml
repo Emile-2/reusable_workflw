@@ -13,10 +13,10 @@ on:
 jobs:
 
   check-rebase:
-    runs-on: ubuntu-latest
+    runs-on: fixed-ip-runner-4core
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         # with:
         #   fetch-depth: 0
         #   token: ${{inputs.token }}
