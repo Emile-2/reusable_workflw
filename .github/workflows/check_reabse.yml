@@ -1,0 +1,27 @@
+name: 'Check if branch is rebased'
+description: 'This action checks if a branch has been rebased on origin/main'
+
+inputs:
+  branch:
+    description: 'The branch to check'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Check if branch is rebased
+      run: |
+        git fetch origin
+        latest_upstream_commit=$(git rev-parse origin/main)
+        if git merge-base --is-ancestor $latest_upstream_commit ${{ inputs.branch }}; then
+            echo "The branch '${{ inputs.branch }}' has been rebased on 'origin/main'."
+        else
+            echo "The branch '${{ inputs.branch }}' has not been rebased on 'origin/main'."
+            exit 1
+        fi
+      shell: bash
