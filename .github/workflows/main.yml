@@ -1,47 +1,47 @@
-name: 'Reusable Rebase Check'
+# name: 'Reusable Rebase Check'
 
-on:
-  workflow_call:
-    inputs:
-      base_ref:
-        description: 'The base branch to check against'
-        required: true
-        type: string
-      head_ref:
-        description: 'The head branch to check'
-        required: true
-        type: string
+# on:
+#   workflow_call:
+#     inputs:
+#       base_ref:
+#         description: 'The base branch to check against'
+#         required: true
+#         type: string
+#       head_ref:
+#         description: 'The head branch to check'
+#         required: true
+#         type: string
 
-jobs:
-  check-rebase:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the base branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.base_ref }}
+# jobs:
+#   check-rebase:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout the base branch
+#         uses: actions/checkout@v3
+#         with:
+#           ref: ${{ inputs.base_ref }}
 
-      - name: Get SHA for base branch
-        id: base_branch
-        run: echo "::set-output name=sha::$(git rev-parse HEAD)"
+#       - name: Get SHA for base branch
+#         id: base_branch
+#         run: echo "::set-output name=sha::$(git rev-parse HEAD)"
 
-      - name: Checkout the head branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.head_ref }}
+#       - name: Checkout the head branch
+#         uses: actions/checkout@v3
+#         with:
+#           ref: ${{ inputs.head_ref }}
 
-      - name: Get SHA for head branch
-        id: head_branch
-        run: echo "::set-output name=sha::$(git rev-parse HEAD)"
+#       - name: Get SHA for head branch
+#         id: head_branch
+#         run: echo "::set-output name=sha::$(git rev-parse HEAD)"
 
 
-      - name: Check if rebased
-        run: |
-          BASE_SHA=${{ steps.base_branch.outputs.sha }}
-          HEAD_SHA=$(git rev-parse HEAD)
-          if git merge-base --is-ancestor $BASE_SHA $HEAD_SHA; then
-            echo "The branch has been rebased on top of the target branch."
-          else
-            echo "The branch has NOT been rebased on top of the target branch."
-            exit 1
-          fi
+#       - name: Check if rebased
+#         run: |
+#           BASE_SHA=${{ steps.base_branch.outputs.sha }}
+#           HEAD_SHA=$(git rev-parse HEAD)
+#           if git merge-base --is-ancestor $BASE_SHA $HEAD_SHA; then
+#             echo "The branch has been rebased on top of the target branch."
+#           else
+#             echo "The branch has NOT been rebased on top of the target branch."
+#             exit 1
+#           fi
