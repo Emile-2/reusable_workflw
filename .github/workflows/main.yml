@@ -15,6 +15,7 @@ jobs:
   check-rebase:
     runs-on: ubuntu-latest
     steps:
+    
       - name: Checkout code
         uses: actions/checkout@v3
         # with:
@@ -23,6 +24,8 @@ jobs:
 
       - name: Check if branch is rebased
         run: |
+          #!/bin/bash
+          
           git_hash=$(git rev-parse "$GITHUB_SHA")
           echo "Branch commit: $git_hash"
 
