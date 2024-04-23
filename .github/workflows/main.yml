@@ -1,47 +1,35 @@
-# name: 'Reusable Rebase Check'
+name: Check Rebase (Reusable)
 
-# on:
-#   workflow_call:
-#     inputs:
-#       base_ref:
-#         description: 'The base branch to check against'
-#         required: true
-#         type: string
-#       head_ref:
-#         description: 'The head branch to check'
-#         required: true
-#         type: string
+on: 
+  workflow_call:
+    inputs:
+      target_branch:
+        type: string
+        required: true
+        description: 'The target branch to compare against (usually main)'
 
-# jobs:
-#   check-rebase:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout the base branch
-#         uses: actions/checkout@v3
-#         with:
-#           ref: ${{ inputs.base_ref }}
+jobs:
+  check-rebase:
+    runs-on: ubuntu-latest
 
-#       - name: Get SHA for base branch
-#         id: base_branch
-#         run: echo "::set-output name=sha::$(git rev-parse HEAD)"
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
-#       - name: Checkout the head branch
-#         uses: actions/checkout@v3
-#         with:
-#           ref: ${{ inputs.head_ref }}
+    - name: Check if rebased
+      run: |
+        git_hash=$(git rev-parse "$GITHUB_SHA")
+        echo "branch commit: $git_hash"
 
-#       - name: Get SHA for head branch
-#         id: head_branch
-#         run: echo "::set-output name=sha::$(git rev-parse HEAD)"
-
-
-#       - name: Check if rebased
-#         run: |
-#           BASE_SHA=${{ steps.base_branch.outputs.sha }}
-#           HEAD_SHA=$(git rev-parse HEAD)
-#           if git merge-base --is-ancestor $BASE_SHA $HEAD_SHA; then
-#             echo "The branch has been rebased on top of the target branch."
-#           else
-#             echo "The branch has NOT been rebased on top of the target branch."
-#             exit 1
-#           fi
+        main_head=$(git rev-parse origin/${{ inputs.target_branch }})
+        echo "Trunk head: $main_head"
+        branch_source_commit_id=$(git merge-base "$git_hash" origin/${{ inputs.target_branch }})
+        echo "First commit of this branch: $branch_source_commit_id"
+        echo "branch_source_commit_id: |$branch_source_commit_id|"
+        echo "main_head:               |$main_head|"
+        
+        if [[ "$branch_source_commit_id" != "$main_head" ]]; then
+          echo "Error: you need to rebase with head ${{ inputs.target_branch }}"
+          exit 1
+        fi 
